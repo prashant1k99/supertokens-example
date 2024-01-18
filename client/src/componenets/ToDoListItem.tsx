@@ -1,28 +1,28 @@
 const ToDoListItem = ({
 	id,
 	task,
-	isCompleted,
+	isDone,
 	completeTask,
 	removeTask,
 }: {
-	id: string
+	id: number
 	task: string
-	isCompleted: boolean
-	completeTask: () => void
-	removeTask: () => void
+	isDone: boolean
+	completeTask: (id: number, isDone: boolean) => void
+	removeTask: (id: number) => void
 }) => {
 	return (
 		<div className="flex flex-row w-full justify-between hover:bg-gray-900 items-center group px-2">
 			<input
 				className="hidden"
 				type="checkbox"
-				id={id}
-				checked={isCompleted}
-				onChange={completeTask}
+				id={`${id}`}
+				checked={isDone}
+				onChange={() => completeTask(id, !isDone)}
 			/>
 			<label
 				className="flex items-center h-10 px-2 rounded cursor-pointer"
-				htmlFor={id}>
+				htmlFor={`${id}`}>
 				<span className="flex items-center justify-center w-5 h-5 text-transparent border-2 border-gray-500 rounded-full">
 					<svg
 						className="w-4 h-4 fill-current"
@@ -36,12 +36,12 @@ const ToDoListItem = ({
 						/>
 					</svg>
 				</span>
-				<span className={'ml-4 text-sm ' + (isCompleted && 'line-through')}>
+				<span className={'ml-4 text-sm ' + (isDone && 'line-through')}>
 					{task}
 				</span>
 			</label>
 			<button
-				onClick={removeTask}
+				onClick={() => removeTask(id)}
 				className="text-red-600 h-5 w-5 hidden group-hover:block">
 				<svg
 					fill="currentColor"

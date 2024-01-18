@@ -1,7 +1,84 @@
+import { useEffect, useState, useTransition } from 'react'
 import NewToDo from './NewToDo'
 import ToDoListItem from './ToDoListItem'
 
+type Todo = {
+	id: number
+	title: string
+	isDone: boolean
+}
+
 const ToDo = () => {
+	const [isPending, startTransition] = useTransition()
+	const [todos, setTodos] = useState<Todo[]>([])
+	useEffect(() => {
+		startTransition(() => {
+			fetch('/todo')
+				.then((res) => {
+					if (res.ok) {
+						return res.json()
+					} else {
+						throw new Error('Something went wrong')
+					}
+				})
+				.then((data) => {
+					setTodos(data.todos)
+				})
+		})
+	}, [])
+
+	const deleteTask = (id: number) => {
+		startTransition(() => {
+			fetch(`/todo/${id}`, {
+				method: 'DELETE',
+			})
+				.then((res) => {
+					if (res.ok) {
+						return res.json()
+					} else {
+						throw new Error('Something went wrong')
+					}
+				})
+				.then(() => {
+					setTodos((prev) => prev.filter((todo) => todo.id != id))
+				})
+		})
+	}
+
+	const completeTask = (id: number, isDone: boolean) => {
+		startTransition(() => {
+			fetch(`/todo/${id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ isDone: isDone }),
+			})
+				.then((res) => {
+					if (res.ok) {
+						return res.json()
+					} else {
+						throw new Error('Something went wrong')
+					}
+				})
+				.then(() => {
+					setTodos((prev) =>
+						prev.map((todo) => {
+							if (todo.id === id) {
+								return { ...todo, isDone: isDone }
+							} else {
+								return todo
+							}
+						})
+					)
+				})
+		})
+	}
+
+	const addedTask = (todo: Todo) => {
+		setTodos((prev) => [todo, ...prev])
+	}
+
 	return (
 		<div className="max-w-3xl p-8 bg-gray-800 rounded-lg shadow-lg w-full text-gray-200">
 			<div className="flex items-center mb-6">
@@ -20,18 +97,20 @@ const ToDo = () => {
 				</svg>
 				<h4 className="font-semibold ml-3 text-lg">My Jobs</h4>
 			</div>
-			<NewToDo />
-			<div className=" max-h-[500px] overflow-auto">
-				{Array.from({ length: 40 }).map((_, i) => (
+			<NewToDo addedTask={addedTask} />
+			<div className="h-[500px] max-h-[500px] overflow-auto">
+				{isPending && <div className="">Loading...</div>}
+				{!isPending && todos.length === 0 && (
+					<div className="text-center">No todos yet</div>
+				)}
+				{todos.map((todo: Todo, i) => (
 					<ToDoListItem
 						key={i}
-						id={i.toString()}
-						task="Buy groceries and so many things"
-						isCompleted={true}
-						completeTask={() => {
-							console.log('complete task', i)
-						}}
-						removeTask={() => {}}
+						id={todo.id}
+						task={todo.title}
+						isDone={todo.isDone}
+						completeTask={completeTask}
+						removeTask={deleteTask}
 					/>
 				))}
 			</div>

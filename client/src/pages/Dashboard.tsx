@@ -1,5 +1,5 @@
 import ToDo from '../componenets/ToDo'
-import NavBar from '../componenets/navbar'
+import NavBar from '../componenets/NavBar'
 
 const Dashboard = () => {
 	return (
