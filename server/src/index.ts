@@ -1,12 +1,31 @@
 import express from 'express'
+import cors from 'cors'
 import type { Request, Response } from 'express'
+import supertokens from 'supertokens-node'
+import { middleware, errorHandler } from 'supertokens-node/framework/express'
+import './util/SuperToken'
 
 const app = express()
 app.use(express.json())
 app.disable('x-powered-by')
 
+app.use(
+	cors({
+		origin: 'http://localhost:5173',
+		methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+		allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
+		credentials: true,
+	})
+)
+app.use(middleware())
+app.use(errorHandler())
+
 app.get('/', (req: Request, res: Response) => {
 	res.json({ message: 'Hello World!' })
+})
+
+app.use('/auth', (_: Request, res: Response) => {
+	res.redirect('/')
 })
 
 app.use('*', (_: Request, res: Response) => {
