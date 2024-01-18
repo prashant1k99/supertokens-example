@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { SuperTokensWrapper } from 'supertokens-auth-react'
 
-import './lib/SuperTokens.ts'
+import './lib/SuperToken.ts'
 import App from './App.tsx'
 import './index.css'
 
