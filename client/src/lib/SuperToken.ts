@@ -15,6 +15,7 @@ SuperTokens.init({
 	recipeList: [
 		ThirdPartyEmailPassword.init({
 			signInAndUpFeature: {
+				defaultToSignUp: true,
 				providers: [Google.init()],
 			},
 		}),
